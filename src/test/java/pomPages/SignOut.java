@@ -1,7 +1,5 @@
 package pomPages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -10,33 +8,36 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
-public class SignOut{
-	WebDriver driver;
-	WebDriverWait wait;
-	
-	@FindBy(xpath="//div[@class='AppHeader-user']//button")
-	WebElement profileIcon;
-	
-	@FindBy(xpath="//div[@class='prc-Dialog-Body-LCvER']//li[24]//a")
-	WebElement signOutBtn;
-	
-	public SignOut(WebDriver driver) {
-		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+/**
+ * Page Object for GitHub Sign Out
+ * Covers: Profile icon, Sign out button
+ * Test Cases: Sign out
+ */
+public class SignOut {
+    WebDriver driver;
+    WebDriverWait wait;
+
+    @FindBy(xpath = "//summary[@aria-label='View profile and more']")
+    WebElement profileIcon;
+
+    @FindBy(xpath = "//button[contains(text(),'Sign out')]" )
+    WebElement signOutBtn;
+
+    public SignOut(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         PageFactory.initElements(driver, this);
-	}
-	
-	public void clickProfile() {
-		wait.until(ExpectedConditions.elementToBeClickable(profileIcon));
-		profileIcon.click();
-		
-	}
-	
-	public void clickSignOut() {
-		wait.until(ExpectedConditions.elementToBeClickable(signOutBtn));
-		signOutBtn.click();
-	}
-	public String checkPageTitle() {
-		return driver.getTitle();
-	}
+    }
+
+    // Clicks the profile icon to open dropdown
+    public void clickProfile() {
+        wait.until(ExpectedConditions.elementToBeClickable(profileIcon));
+        profileIcon.click();
+    }
+
+    // Clicks the 'Sign out' button
+    public void clickSignOut() {
+        wait.until(ExpectedConditions.elementToBeClickable(signOutBtn));
+        signOutBtn.click();
+    }
 }
