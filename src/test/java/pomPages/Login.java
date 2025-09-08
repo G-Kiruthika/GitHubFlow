@@ -1,6 +1,5 @@
 package pomPages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -9,63 +8,110 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
+/**
+ * Page Object Model class for GitHub Login functionality.
+ * Encapsulates all login-related elements and actions.
+ * Supports: Sign-in link, Email field, Password field, Sign-in button.
+ * Methods: clickLoginLink(), enterEmail(), enterPassword(), clickSignInButton(), visibility/clickability checks.
+ * Follows best practices from framework knowledge base and test cases.
+ */
+public class Login {
+    private WebDriver driver;
+    private WebDriverWait wait;
 
-public class Login{
-	WebDriver driver;
-	WebDriverWait wait;
-	
-	@FindBy(xpath="//div[@class='position-relative HeaderMenu-link-wrap d-lg-inline-block']//a")
-	WebElement signInLink;
-	@FindBy(xpath="//input[@id='login_field']")
-	WebElement emailField;
-	@FindBy(xpath="//input[@id='password']")
-	WebElement passwordField;
-	@FindBy(xpath="//input[@value='Sign in']")
-	WebElement signInButton;
-	
-	public Login(WebDriver driver) {
-		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    // Locators for GitHub login page elements
+    @FindBy(xpath = "//a[contains(text(),'Sign in') or @href='/login']")
+    private WebElement signInLink;
+
+    @FindBy(id = "login_field")
+    private WebElement emailField;
+
+    @FindBy(id = "password")
+    private WebElement passwordField;
+
+    @FindBy(name = "commit")
+    private WebElement signInButton;
+
+    @FindBy(xpath = "//div[contains(@class,'flash-error')]" )
+    private WebElement errorMessage;
+
+    public Login(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         PageFactory.initElements(driver, this);
-	}
-	
-	public void clickLoginLink() {
-		signInLink.click();
-	}
-	//email validation
-    public boolean verifyEmailVisibility() {
-    	wait.until(ExpectedConditions.visibilityOf(emailField));
-    	return emailField.isDisplayed();
     }
-    public boolean verifyEmailClickability() {
-    	wait.until(ExpectedConditions.elementToBeClickable(emailField));
-    	return emailField.isEnabled();
+
+    /**
+     * Clicks the 'Sign in' link on the GitHub homepage.
+     */
+    public void clickLoginLink() {
+        wait.until(ExpectedConditions.elementToBeClickable(signInLink));
+        signInLink.click();
     }
-    
+
+    /**
+     * Enters the email/username into the login field.
+     * @param email GitHub username or email
+     */
     public void enterEmail(String email) {
-    	emailField.sendKeys(email);
+        wait.until(ExpectedConditions.visibilityOf(emailField));
+        emailField.clear();
+        emailField.sendKeys(email);
     }
-    
-    public boolean verifyPasswordVisibility() {
-    	wait.until(ExpectedConditions.visibilityOf(passwordField));
-    	return emailField.isDisplayed();
-    }
-    public boolean verifyPasswordClickability() {
-    	wait.until(ExpectedConditions.elementToBeClickable(passwordField));
-    	return emailField.isEnabled();
-    }
-    
+
+    /**
+     * Enters the password into the password field.
+     * @param password GitHub password
+     */
     public void enterPassword(String password) {
-    	passwordField.sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOf(passwordField));
+        passwordField.clear();
+        passwordField.sendKeys(password);
     }
-    
+
+    /**
+     * Clicks the 'Sign in' button to submit credentials.
+     */
     public void clickSignInButton() {
-    	wait.until(ExpectedConditions.elementToBeClickable(signInButton));
-    	signInButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(signInButton));
+        signInButton.click();
     }
-    
-    public String homePageTitleCheck() {
-    	System.out.println( driver.getTitle());
-        return driver.getTitle();
+
+    /**
+     * Checks if the error message is displayed (for invalid/empty credentials).
+     * @return true if error message is visible, false otherwise
+     */
+    public boolean isErrorMessageDisplayed() {
+        try {
+            wait.until(ExpectedConditions.visibilityOf(errorMessage));
+            return errorMessage.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Gets the error message text (if present).
+     * @return error message string, or null if not present
+     */
+    public String getErrorMessageText() {
+        if (isErrorMessageDisplayed()) {
+            return errorMessage.getText();
+        }
+        return null;
+    }
+
+    /**
+     * Waits for the email field to be visible (used for page load verification).
+     */
+    public void waitForEmailField() {
+        wait.until(ExpectedConditions.visibilityOf(emailField));
+    }
+
+    /**
+     * Waits for the password field to be visible (used for page load verification).
+     */
+    public void waitForPasswordField() {
+        wait.until(ExpectedConditions.visibilityOf(passwordField));
     }
 }
