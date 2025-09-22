@@ -1,89 +1,77 @@
 package pomTest;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.testng.Assert;
-import org.testng.AssertJUnit;
-import java.time.Duration;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.testng.annotations.*;
+import pomPages.Login;
+import pomPages.HomePage;
+import pomPages.CreateRepoPage;
+import pomPages.DeleteRepoPage;
+import pomPages.SignOut;
 
-import pomPages.*;
-public class TestScripts{
-	WebDriver driver;
-	@BeforeClass
-	public void setup() {
-		driver = new ChromeDriver();
-		 
+public class testscripts {
+    WebDriver driver;
+    Login loginPage;
+    HomePage homePage;
+    CreateRepoPage createRepoPage;
+    DeleteRepoPage deleteRepoPage;
+    SignOut signOutPage;
+
+    String baseUrl = "https://github.com";
+    String username = "your_username"; // Replace with test data
+    String password = "your_password"; // Replace with test data
+    String repoName = "test-repo-automation"; // Replace with test data
+
+    @BeforeClass
+    public void setUp() {
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
-		driver.get("https://www.github.com");
-		System.out.println("Navigating to url");
-		
-	}
-	
-	@Test(priority=1)
-	public void loginPositive() throws Exception {
-		Login login = new Login(driver);
-		login.clickLoginLink();
-		
-		login.verifyEmailVisibility();
-		login.verifyEmailClickability();
-		login.enterEmail("gkiruthika1505@gmail.com");
-		
-		login.verifyPasswordVisibility();
-		login.verifyPasswordClickability();
-		login.enterPassword("Ascendion@123");
-		
-		login.clickSignInButton();
-		Thread.sleep(3000);
-		System.out.println("Account signed in");
-		String actualTitle = login.homePageTitleCheck();
-		Assert.assertTrue(actualTitle.contains("GitHub"), "Homepage title does not match!");
-		
-		HomePage home = new HomePage(driver);
-		home.clickCreateRepo();
-	}
-	@Test(priority=2)
-	public void RepoCreation() throws Exception {
-		CreateRepoPage create = new CreateRepoPage(driver);
-		create.enterRepoName("Ascendion");
-		create.createRepoBtnClick();
-		System.out.println("Repository created");
-	}
-	
-	@Test(priority=3)
-	public void DeleteRepo() throws Exception {
-		DeleteRepoPage delete = new DeleteRepoPage(driver);
-		delete.clickSettings();
-		delete.clickDelete();
-		delete.clickProceedDelete();
-		delete.clickRead();
-		Thread.sleep(2000);
-		delete.typeRepoName();
-		System.out.println("Repository deleted");
-		
-	}
-	
-	@Test(priority=4)
-	public void SignOut() {
-		SignOut signout = new SignOut(driver);
-		signout.clickProfile();
-		signout.clickSignOut();
-		System.out.println("Account signed out");
-	}
-	
-	@AfterClass
-	public void tearDown() {
-		if (driver != null) {
+        driver.get(baseUrl);
+        loginPage = new Login(driver);
+        homePage = new HomePage(driver);
+        createRepoPage = new CreateRepoPage(driver);
+        deleteRepoPage = new DeleteRepoPage(driver);
+        signOutPage = new SignOut(driver);
+    }
+
+    @Test(priority = 1)
+    public void loginPositive() {
+        loginPage.clickLoginLink();
+        loginPage.enterEmail(username);
+        loginPage.enterPassword(password);
+        loginPage.clickSignInButton();
+        Assert.assertTrue(driver.getTitle().contains("GitHub"), "Login failed or incorrect page title.");
+    }
+
+    @Test(priority = 2)
+    public void RepoCreation() {
+        homePage.clickCreateRepo();
+        createRepoPage.enterRepoName(repoName);
+        createRepoPage.createRepoBtnClick();
+        Assert.assertTrue(driver.getCurrentUrl().contains(repoName), "Repository creation failed.");
+    }
+
+    @Test(priority = 3)
+    public void DeleteRepo() {
+        deleteRepoPage.clickSettings();
+        deleteRepoPage.clickDelete();
+        deleteRepoPage.typeRepoName(username + "/" + repoName);
+        deleteRepoPage.clickProceedDelete();
+        Assert.assertFalse(driver.getCurrentUrl().contains(repoName), "Repository deletion failed.");
+    }
+
+    @Test(priority = 4)
+    public void SignOut() {
+        signOutPage.clickProfile();
+        signOutPage.clickSignOut();
+        Assert.assertTrue(driver.getTitle().contains("Sign in"), "Sign out failed.");
+    }
+
+    @AfterClass
+    public void tearDown() {
+        if (driver != null) {
             driver.quit();
-            System.out.println("Browser closed.");
         }
-	}
+    }
 }
