@@ -1,0 +1,12 @@
+android {
+    defaultConfig {
+        testInstrumentationRunner "io.cucumber.android.runner.CucumberAndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+}
+
+dependencies {
+    androidTestImplementation 'io.cucumber:cucumber-android:7.14.0'
+    androidTestImplementation 'io.cucumber:cucumber-picocontainer:7.14.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
